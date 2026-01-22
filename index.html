@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bảng tra cứu chỉ số</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #eaf7e5;
+      color: #333;
+    }
+    .container {
+      max-width: 850px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 0 12px #b7d3b1;
+    }
+    h1 {
+      text-align: center;
+      color: #2e7d32;
+    }
+    .search-bar {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    select, input {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin: 0 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #c8e6c9;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: #a5d6a7;
+    }
+    .btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.25s;
+    }
+    .btn-success {
+      background: #4caf50;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #43a047;
+    }
+    #note {
+      text-align: center;
+      font-style: italic;
+      color: #555;
+    }
+    .plant-header {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>BẢNG TRA CỨU CHỈ SỐ</h1>
+
+    <div class="search-bar">
+      <label>🔍 Tìm cây:</label>
+      <input type="text" id="searchInput" placeholder="Gõ tên cây (ví dụ: ớt, lan, xà lách)">
+      <span>Hoặc chọn cây:</span>
+      <select id="plantSelect"></select>
+    </div>
+
+    <div class="plant-info" id="plantInfo">
+      <div class="plant-header">
+        <div id="plantIcon" style="font-size:48px;">🌱</div>
+        <h2 id="plantName">Tên cây</h2>
+        <p id="plantLatin"><em>(Tên khoa học)</em></p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Thông số</th>
+            <th>Giá trị phù hợp</th>
+          </tr>
+        </thead>
+        <tbody id="paramTable"></tbody>
+      </table>
+
+      <p id="note"><em>Chọn cây để xem thông số khuyến nghị.</em></p>
+
+      <div style="text-align:center; margin-top:20px;">
+        <button id="applyBtn" class="btn btn-success">🌿 Áp dụng thông số</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+     window.addEventListener("DOMContentLoaded", () => {
+    // 🌱 Danh sách cây trồng
+    const plants = [
+      {
+        name: "Lúa",
+        latin: "Oryza sativa",
+        icon: "🌾",
+        nd: "20–35°C",
+        da: "80–90%,
+        note: "Ưa nước, thích hợp đất phù sa."
+      },
+      {
+        name: "Cà chua",
+        latin: "Solanum lycopersicum",
+        icon: "🍅",
+        nd: "22–28°C",
+        da: "60–70%",
+        note: "Cần nhiều ánh sáng và thoáng khí."
+      },
+      {
+        name: "Xà lách",
+        latin: "Lactuca sativa",
+        icon: "🥬",
+        nd: "15–25°C",
+        da: "60–70%",
+        note: "Phát triển tốt ở khí hậu mát."
+      },
+      {
+        name: "Ớt",
+        latin: "Capsicum annuum",
+        icon: "🌶️",
+        nd: "25–30°C",
+        da: "60–70%",
+        note: "Ưa sáng, cần đất thoát nước tốt."
+      },
+      {
+        name: "Dưa leo",
+        latin: "Cucumis sativus",
+        icon: "🥒",
+        nd: "20–30°C",
+        da: "70–80%",
+        note: "Cần nhiều nước và giá thể thoáng."
+      },
+      {
+        name: "Hoa Hồng",
+        latin: "Rosa spp.",
+        icon: "🌹",
+        nd: "25–32°C",
+        da: "50–70%",
+        note: "Ưa nắng, đất tơi xốp."
+      },
+      {
+
+      {
+        name: "Lan hoàng thảo",
+        latin: "Dendrobium spp.",
+        icon: "🌸",
+        nd: "20–30°C",
+        da: "60–80%",
+        note: "Ưa ẩm, tránh nắng gắt."
+      },
+      {
+        name: "Phong lan Hồ Điệp",
+        latin: "Phalaenopsis spp.",
+        icon: "💮",
+        nd: "18–28°C",
+        da: "60–80%",
+        note: "Ưa ẩm, không chịu nắng trực tiếp."
+      },
+      {
+        name: "Dương xỉ tổ chim",
+        latin: "Asplenium nidus",
+        icon: "🌱",
+        nd: "18–28°C",
+        da: "60–80%",
+        note: "Ưa mát, trồng nơi có độ ẩm cao."
+      },
+      {
+        name: "Cát lan",
+        latin: "Cattleya spp.",
+        icon: "🌼",
+        nd: "20–32°C",
+        da: "60–80%",
+        note: "Ưa sáng nhẹ, cần thông thoáng khí."
+      },
+    ];
+    
+      const select = document.getElementById("plantSelect");
+      const tableBody = document.getElementById("paramTable");
+      const searchInput = document.getElementById("searchInput");
+      const applyBtn = document.getElementById("applyBtn");
+      // Normalize text
+      const normalizeText = text => text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
+
+      // Load plants into dropdown
+function loadPlantList(list) {
+  select.innerHTML = "";
+
+  // 🟠 If no plant matches
+  if (list.length === 0) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Không tìm thấy cây...";
+    opt.disabled = true;
+    select.appendChild(opt);
+    select.disabled = false; // still clickable
+    return;
+  }
+
+  // 🟢 Otherwise, load the matching plants
+  list.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = plants.indexOf(p);
+    opt.textContent = `${p.icon} ${p.name}`;
+    select.appendChild(opt);
+  });
+
+
+
+  // 🟢 Highlight the first real plant (not blank)
+  select.selectedIndex = 0;
+  showPlant(select.value);
+
+  select.disabled = false;
+}
+
+
+
+      // Show plant info
+      function showPlant(i){
+        if(i === "" || i === undefined) return;
+        const p = plants[i];
+        document.getElementById("plantIcon").textContent = p.icon;
+        document.getElementById("plantName").textContent = p.name;
+        document.getElementById("plantLatin").innerHTML = `<em>${p.latin}</em>`;
+        tableBody.innerHTML = `
+          <tr><td>Nhiệt độ</td><td>${p.nd}</td></tr>
+          <tr><td>Độ ẩm đất</td><td>${p.da}</td></tr>
+        `;
+        document.getElementById("note").textContent = p.note;
+      }
+
+      // Filter plants
+      function filterPlants(keyword){
+        const k = normalizeText(keyword);
+        if(k.length<2){ loadPlantList(plants); return; }
+        const filtered = plants.filter(p => normalizeText(p.name).includes(k));
+        loadPlantList(filtered);
+      }
+
+      // Event listeners
+      searchInput.addEventListener("input", e => filterPlants(e.target.value.trim()));
+      select.addEventListener("change", e => showPlant(e.target.value));
+
+       
+      // Blynk setup
+      const BLYNK_API_URL = "https://blynk.cloud/external/api";
+
+async function sendMultipleDataToBlynk(data) {
+  try {
+    const resp = await fetch("/api/sendBlynk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+   });
+   const result = await resp.json();
+   alert(result.message);
+  } catch (err) {
+    console.error(err);
+    alert("🚫 Không thể gửi dữ liệu đến Blynk (check Node.js server)");
+  }
+ }
+
+
+      applyBtn.addEventListener("click", async () => {
+        const idx = select.value;
+        if(idx==="") return alert("⚠️ Vui lòng chọn cây trước khi gửi!");
+        
+        applyBtn.disabled = true;
+         // Use GPS if available, fallback to manual input
+
+       }
+
+
+await sendMultipleDataToBlynk({
+  ...plants[idx],
+});
+
+        applyBtn.disabled = false;
+      });
+
+       
+      // Initial load
+      loadPlantList(plants);
+      showPlant(0);
+    });
+ </script>
+</body>
+</html>  
