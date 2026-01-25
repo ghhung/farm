@@ -72,8 +72,17 @@
 </head>
 <body>
   <div class="container">
+    <div style="text-align:right; margin-bottom:10px;">
+     <label style="font-weight:bold;">
+    🌱
+      <input type="checkbox" id="modeSwitch">
+      🐷
+     </label>
+    </div>
+
     <h1>BẢNG TRA CỨU CHỈ SỐ</h1>
 
+  <div id="plantSection">
     <div class="search-bar">
       <label>🔍 Tìm cây:</label>
       <input type="text" id="searchInput" placeholder="Gõ tên cây (ví dụ: ớt, lan, xà lách)">
@@ -105,30 +114,54 @@
       </div>
     </div>
   </div>
-     
-   <div class="search-bar">
-      <label>🔍 Tìm động vật:</label>
-      <input type="text" id="searchInput" placeholder="Gõ tên động vật (ví dụ: ngựa, gà, lợn)">
-      <span>Hoặc chọn động vật:</span>
-      <select id="animalSelect"></select>
-    </div>
 
-    <div class="animal-info" id="animalInfo">
-      <div class="animal-header">
-        <div id="animalIcon" style="font-size:48px;">🦓</div>
-        <h2 id="animalName">Tên động vật</h2>
-        <p id="animalLatin"><em>(Tên khoa học)</em></p>
-      </div>
+  <div id="animalSection" style="display:none;">
+    <div class="search-bar">
+  <label>🔍 Tìm con vật:</label>
+  <input type="text" id="animalSearchInput" placeholder="Gõ tên con vật">
+  <span>Hoặc chọn:</span>
+  <select id="animalSelect"></select>
+</div>
+
+<div class="animal-info">
+  <div class="plant-header">
+    <div id="animalIcon" style="font-size:48px;">🐷</div>
+    <h2 id="animalName">Tên con vật</h2>
+    <p id="animalLatin"><em>(Tên khoa học)</em></p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Thông số</th>
+        <th>Giá trị phù hợp</th>
+      </tr>
+    </thead>
+    <tbody id="paramTable"></tbody>
+  </table>
+
+  <p id="note"><em>Chọn con vật để xem thông số khuyến nghị.</em></p>
+   <div style="text-align:center; margin-top:20px;">
+   </div>
+</div>
+
+
+        <button id="applyBtn" class="btn btn-success"> Áp dụng thông số</button>
+       </div>
+     </div>
+   </div>
+  </div>
+  
   <script>
-     window.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("DOMContentLoaded", () => {
     // 🌱 Danh sách cây trồng
     const plants = [
       {
-        name: "Lúa",
-        latin: "Oryza sativa",
+        name: "Lúa
+           latin: "Oryza sativa",
         icon: "🌾",
         nd: "20–35°C",
-        da: "80–90%,
+        da: "80–90%",
         note: "Ưa nước, thích hợp đất phù sa."
       },
       {
@@ -206,116 +239,134 @@
         note: "Ưa sáng nhẹ, cần thông thoáng khí."
       },
     ];
-    
+  
+    const animals = [
+     {
+      name: "Heo",
+      latin: "Sus scrofa domesticus",
+      icon: "🐷",
+      temp: "18–30°C",
+      humidity: "60–75%",
+      note: "Cần chuồng khô ráo, thông thoáng."
+    },
+    {
+      name: "Ngựa",
+      latin: "Equus ferus caballus",
+      icon: "🐎",
+      temp: "15–28°C",
+      humidity: "50–70%",
+      note: "Cần vận động nhiều, chuồng sạch."
+    }
+   ];
+
+     const modeSwitch = document.getElementById("modeSwitch");
+     const plantSection = document.getElementById("plantSection");
+     const animalSection = document.getElementById("animalSection");
+
+  modeSwitch.addEventListener("change", () => {
+    plantSection.style.display = modeSwitch.checked ? "none" : "block";
+    animalSection.style.display = modeSwitch.checked ? "block" : "none";
+  });
+
       const select = document.getElementById("plantSelect");
       const tableBody = document.getElementById("paramTable");
       const searchInput = document.getElementById("searchInput");
       const applyBtn = document.getElementById("applyBtn");
       // Normalize text
-      const normalizeText = text => text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
+     const normalize = text =>
+    text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-      // Load plants into dropdown
-function loadPlantList(list) {
-  select.innerHTML = "";
-
-  // 🟠 If no plant matches
-  if (list.length === 0) {
-    const opt = document.createElement("option");
-    opt.value = "";
-    opt.textContent = "Không tìm thấy cây...";
-    opt.disabled = true;
-    select.appendChild(opt);
-    select.disabled = false; // still clickable
-    return;
+  function loadSelect(select, list) {
+    select.innerHTML = "";
+    list.forEach((item, i) => {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${item.icon} ${item.name}`;
+      select.appendChild(opt);
+    });
   }
 
-  // 🟢 Otherwise, load the matching plants
-  list.forEach(p => {
-    const opt = document.createElement("option");
-    opt.value = plants.indexOf(p);
-    opt.textContent = `${p.icon} ${p.name}`;
-    select.appendChild(opt);
+  function renderInfo(item, ids) {
+    document.getElementById(ids.icon).textContent = item.icon;
+    document.getElementById(ids.name).textContent = item.name;
+    document.getElementById(ids.latin).innerHTML = `<em>${item.latin}</em>`;
+    document.getElementById(ids.table).innerHTML = `
+      <tr><td>Temperature</td><td>${item.temp}</td></tr>
+      <tr><td>Humidity</td><td>${item.humidity}</td></tr>
+    `;
+    document.getElementById(ids.note).textContent = item.note;
+  }
+
+  /* ========= PLANTS ========= */
+  const plantSelect = document.getElementById("plantSelect");
+  const plantSearch = document.getElementById("searchInput");
+
+  loadSelect(plantSelect, plants);
+  renderInfo(plants[0], {
+    icon: "plantIcon",
+    name: "plantName",
+    latin: "plantLatin",
+    table: "paramTable",
+    note: "note"
   });
 
-
-
-  // 🟢 Highlight the first real plant (not blank)
-  select.selectedIndex = 0;
-  showPlant(select.value);
-
-  select.disabled = false;
-}
-
-
-
-      // Show plant info
-      function showPlant(i){
-        if(i === "" || i === undefined) return;
-        const p = plants[i];
-        document.getElementById("plantIcon").textContent = p.icon;
-        document.getElementById("plantName").textContent = p.name;
-        document.getElementById("plantLatin").innerHTML = `<em>${p.latin}</em>`;
-        tableBody.innerHTML = `
-          <tr><td>Nhiệt độ</td><td>${p.nd}</td></tr>
-          <tr><td>Độ ẩm đất</td><td>${p.da}</td></tr>
-        `;
-        document.getElementById("note").textContent = p.note;
-      }
-
-      // Filter plants
-      function filterPlants(keyword){
-        const k = normalizeText(keyword);
-        if(k.length<2){ loadPlantList(plants); return; }
-        const filtered = plants.filter(p => normalizeText(p.name).includes(k));
-        loadPlantList(filtered);
-      }
-
-      // Event listeners
-      searchInput.addEventListener("input", e => filterPlants(e.target.value.trim()));
-      select.addEventListener("change", e => showPlant(e.target.value));
-
-       
-      // Blynk setup
-      const BLYNK_API_URL = "https://blynk.cloud/external/api";
-
-async function sendMultipleDataToBlynk(data) {
-  try {
-    const resp = await fetch("/api/sendBlynk", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-   });
-   const result = await resp.json();
-   alert(result.message);
-  } catch (err) {
-    console.error(err);
-    alert("🚫 Không thể gửi dữ liệu đến Blynk (check Node.js server)");
-  }
- }
-
-
-      applyBtn.addEventListener("click", async () => {
-        const idx = select.value;
-        if(idx==="") return alert("⚠️ Vui lòng chọn cây trước khi gửi!");
-        
-        applyBtn.disabled = true;
-         // Use GPS if available, fallback to manual input
-
-       }
-
-
-await sendMultipleDataToBlynk({
-  ...plants[idx],
-});
-
-        applyBtn.disabled = false;
-      });
-
-       
-      // Initial load
-      loadPlantList(plants);
-      showPlant(0);
+  plantSelect.addEventListener("change", e => {
+    renderInfo(plants[e.target.value], {
+      icon: "plantIcon",
+      name: "plantName",
+      latin: "plantLatin",
+      table: "paramTable",
+      note: "note"
     });
+  });
+
+  plantSearch.addEventListener("input", e => {
+    const k = normalize(e.target.value);
+    const filtered = plants.filter(p => normalize(p.name).includes(k));
+    loadSelect(plantSelect, filtered.length ? filtered : plants);
+  });
+
+  /* ========= ANIMALS ========= */
+  const animalSelect = document.getElementById("animalSelect");
+  const animalSearch = document.getElementById("animalSearchInput");
+
+  loadSelect(animalSelect, animals);
+  renderInfo(animals[0], {
+    icon: "animalIcon",
+    name: "animalName",
+    latin: "animalLatin",
+    table: "animalParamTable",
+    note: "animalNote"
+  });
+
+  animalSelect.addEventListener("change", e => {
+    renderInfo(animals[e.target.value], {
+      icon: "animalIcon",
+      name: "animalName",
+      latin: "animalLatin",
+      table: "animalParamTable",
+      note: "animalNote"
+    });
+  });
+
+  animalSearch.addEventListener("input", e => {
+    const k = normalize(e.target.value);
+    const filtered = animals.filter(a => normalize(a.name).includes(k));
+    loadSelect(animalSelect, filtered.length ? filtered : animals);
+  });
+
+  /* ========= APPLY BUTTON ========= */
+  document.getElementById("applyBtn").addEventListener("click", () => {
+    const isAnimal = modeSwitch.checked;
+    const index = isAnimal ? animalSelect.value : plantSelect.value;
+    const data = isAnimal ? animals[index] : plants[index];
+
+    alert(`Applied settings for: ${data.name}`);
+    console.log("Applied data:", data);
+    // 👉 send to Blynk / API here
+  });
+
+     });
  </script>
 </body>
 </html>  
