@@ -81,6 +81,9 @@
     </div>
 
     <h1>BẢNG TRA CỨU CHỈ SỐ</h1>
+    <div style="text-align:center; margin-top:20px;">
+        <button id="applyBtn" class="btn btn-success"> Áp dụng thông số</button>
+      </div>
 
   <div id="plantSection">
     <div class="search-bar">
@@ -104,14 +107,11 @@
             <th>Giá trị phù hợp</th>
           </tr>
         </thead>
-        <tbody id="paramTable"></tbody>
+        <tbody id="plantParamTable"></tbody>
       </table>
 
-      <p id="note"><em>Chọn cây để xem thông số khuyến nghị.</em></p>
+      <p id="plantNote"><em>Chọn cây để xem thông số khuyến nghị.</em></p>
 
-      <div style="text-align:center; margin-top:20px;">
-        <button id="applyBtn" class="btn btn-success">🌿 Áp dụng thông số</button>
-      </div>
     </div>
   </div>
 
@@ -137,16 +137,15 @@
         <th>Giá trị phù hợp</th>
       </tr>
     </thead>
-    <tbody id="paramTable"></tbody>
+    <tbody id="animalParamTable"></tbody>
   </table>
 
-  <p id="note"><em>Chọn con vật để xem thông số khuyến nghị.</em></p>
+  <p id="animalNote"><em>Chọn con vật để xem thông số khuyến nghị.</em></p>
    <div style="text-align:center; margin-top:20px;">
    </div>
 </div>
 
 
-        <button id="applyBtn" class="btn btn-success"> Áp dụng thông số</button>
        </div>
      </div>
    </div>
@@ -158,7 +157,7 @@
     const plants = [
       {
         name: "Lúa
-           latin: "Oryza sativa",
+        latin: "Oryza sativa",
         icon: "🌾",
         nd: "20–35°C",
         da: "80–90%",
@@ -205,8 +204,6 @@
         note: "Ưa nắng, đất tơi xốp."
       },
       {
-
-      {
         name: "Lan hoàng thảo",
         latin: "Dendrobium spp.",
         icon: "🌸",
@@ -245,16 +242,16 @@
       name: "Heo",
       latin: "Sus scrofa domesticus",
       icon: "🐷",
-      temp: "18–30°C",
-      humidity: "60–75%",
+      nd: "18–30°C",
+      da: "60–75%",
       note: "Cần chuồng khô ráo, thông thoáng."
     },
     {
       name: "Ngựa",
       latin: "Equus ferus caballus",
       icon: "🐎",
-      temp: "15–28°C",
-      humidity: "50–70%",
+      nd: "15–28°C",
+      da: "50–70%",
       note: "Cần vận động nhiều, chuồng sạch."
     }
    ];
@@ -287,15 +284,18 @@
   }
 
   function renderInfo(item, ids) {
-    document.getElementById(ids.icon).textContent = item.icon;
-    document.getElementById(ids.name).textContent = item.name;
-    document.getElementById(ids.latin).innerHTML = `<em>${item.latin}</em>`;
-    document.getElementById(ids.table).innerHTML = `
-      <tr><td>Temperature</td><td>${item.temp}</td></tr>
-      <tr><td>Humidity</td><td>${item.humidity}</td></tr>
-    `;
-    document.getElementById(ids.note).textContent = item.note;
-  }
+  document.getElementById(ids.icon).textContent = item.icon;
+  document.getElementById(ids.name).textContent = item.name;
+  document.getElementById(ids.latin).innerHTML = `<em>${item.latin}</em>`;
+
+  document.getElementById(ids.table).innerHTML = `
+    <tr><td>Nhiệt độ</td><td>${item.nd}</td></tr>
+    <tr><td>Độ ẩm</td><td>${item.da}</td></tr>
+  `;
+
+  document.getElementById(ids.note).textContent = item.note;
+}
+
 
   /* ========= PLANTS ========= */
   const plantSelect = document.getElementById("plantSelect");
@@ -306,8 +306,8 @@
     icon: "plantIcon",
     name: "plantName",
     latin: "plantLatin",
-    table: "paramTable",
-    note: "note"
+    table: "plantParamTable",
+    note: "plantNote"
   });
 
   plantSelect.addEventListener("change", e => {
@@ -315,8 +315,8 @@
       icon: "plantIcon",
       name: "plantName",
       latin: "plantLatin",
-      table: "paramTable",
-      note: "note"
+      table: "plantParamTable",
+      note: "plantNote"
     });
   });
 
