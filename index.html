@@ -104,7 +104,38 @@
         <tbody id="plantParamTable"></tbody>
       </table>
 
-      <p id="note"><em>Chọn cây để xem thông số khuyến nghị.</em></p>
+      <p id="plantNote"><em>Chọn cây để xem thông số khuyến nghị.</em></p>
+
+      
+    </div>
+  </div>
+        <div id="animalSection">
+    <div class="search-bar">
+      <label>🔍 Tìm con vậtlabel>
+      <input type="text" id="searchInput" placeholder="Gõ tên con vật (ví dụ: ớt, lan, xà lách)">
+      <span>Hoặc chọn:</span>
+      <select id="animalSelect"></select>
+    </div>
+
+
+    <div class="animal-info" id="plantInfo">
+      <div class="animal-header">
+        <div id="animalIcon" style="font-size:48px;">🌱</div>
+        <h2 id="animalName">Tên cây</h2>
+        <p id="animalLatin"><em>(Tên khoa học)</em></p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Thông số</th>
+            <th>Giá trị phù hợp</th>
+          </tr>
+        </thead>
+        <tbody id="animalParamTable"></tbody>
+      </table>
+
+      <p id="animalNote"><em>Chọn con vật để xem thông số khuyến nghị.</em></p>
 
       
     </div>
@@ -236,17 +267,28 @@
         note: "Ưa sáng nhẹ, cần thông thoáng khí."
       },
     ];
-    
+    const animals = [
+     {
+      name: "Heo",
+      latin: "Sus scrofa domesticus",
+      icon: "🐷",
+      nd: "18–30°C",
+      da: "60–75%",
+      note: "Cần chuồng khô ráo, thông thoáng."
+    },
+    {
+      name: "Ngựa",
+      latin: "Equus ferus caballus",
+      icon: "🐎",
+      nd: "15–28°C",
+      da: "50–70%",
+      note: "Cần vận động nhiều, chuồng sạch."
+    }
+   ];
       const select = document.getElementById("plantSelect");
       const tableBody = document.getElementById("paramTable");
       const searchInput = document.getElementById("searchInput");
-      const applyBtn = document.getElementById("applyBtn");
-      const latInput = document.getElementById("latInput");
-      const lonInput = document.getElementById("lonInput");
-      const geoBtn = document.getElementById("geoBtn");
 
-      let currentLat = null;
-      let currentLon = null;
       // Normalize text
       const normalizeText = text => text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
 
@@ -313,23 +355,6 @@ function loadPlantList(list) {
       searchInput.addEventListener("input", e => filterPlants(e.target.value.trim()));
       select.addEventListener("change", e => showPlant(e.target.value));
 
-      geoBtn.addEventListener("click", ()=>{
-    if(!navigator.geolocation){
-      return alert("⚠️ Trình duyệt không hỗ trợ GPS.");
-    }
-    geoBtn.disabled = true;
-    navigator.geolocation.getCurrentPosition(pos=>{
-      currentLat = pos.coords.latitude;
-      currentLon = pos.coords.longitude;
-      latInput.value = currentLat.toFixed(4);
-      lonInput.value = currentLon.toFixed(4);
-      geoBtn.disabled = false;
-      alert("✅ GPS đã được lấy thành công!");
-    }, err=>{
-      alert("⚠️ Không lấy được vị trí: " + err.message);
-      geoBtn.disabled = false;
-    });
-  });
        
       // Blynk setup
       const BLYNK_API_URL = "https://blynk.cloud/external/api";
@@ -354,20 +379,7 @@ async function sendMultipleDataToBlynk(data) {
         const idx = select.value;
         if(idx==="") return alert("⚠️ Vui lòng chọn cây trước khi gửi!");
         
-        applyBtn.disabled = true;
-         // Use GPS if available, fallback to manual input
-       let lat = parseFloat(latInput.value);
-       let lon = parseFloat(lonInput.value);
-
-       // if manual input is empty or invalid, fallback to GPS
-       if (isNaN(lat)) lat = currentLat;
-       if (isNaN(lon)) lon = currentLon;
-
-       if (isNaN(lat) || isNaN(lon)) {
-          return alert("⚠️ Vui lòng nhập vĩ độ/kinh độ hoặc dùng GPS.");
-       }
-
-
+      
 await sendMultipleDataToBlynk({
   ...plants[idx],
   lat: Number(lat),
