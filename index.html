@@ -285,8 +285,10 @@
       note: "Cần vận động nhiều, chuồng sạch."
     }
    ];
-      const select = document.getElementById("plantSelect");
-      const tableBody = document.getElementById("paramTable");
+      const plantSelect = document.getElementById("plantSelect");
+      const paramTableBody = document.getElementById("plantParamTable");
+      const animalselect = document.getElementById("animalSelect");
+      const animalTableBody = document.getElementById("animalParamTable");
       const searchInput = document.getElementById("searchInput");
 
       // Normalize text
@@ -342,6 +344,37 @@ function loadPlantList(list) {
         `;
         document.getElementById("note").textContent = p.note;
       }
+       // Load plants into dropdown
+function loadAnimalList(list) {
+  select.innerHTML = "";
+
+  // 🟠 If no plant matches
+  if (list.length === 0) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Không tìm thấy con vật...";
+    opt.disabled = true;
+    select.appendChild(opt);
+    select.disabled = false; // still clickable
+    return;
+  }
+
+  // 🟢 Otherwise, load the matching plants
+  list.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = plants.indexOf(p);
+    opt.textContent = `${p.icon} ${p.name}`;
+    select.appendChild(opt);
+  });
+
+
+
+  // 🟢 Highlight the first real plant (not blank)
+  select.selectedIndex = 0;
+  showPlant(select.value);
+
+  select.disabled = false;
+}
 
       // Filter plants
       function filterPlants(keyword){
